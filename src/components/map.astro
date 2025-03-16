@@ -1,0 +1,67 @@
+---
+import type { CollectionEntry } from "astro:content";
+
+interface Props {
+    initialEntry?: CollectionEntry<"wiki">;
+}
+
+const { initialEntry } = Astro.props;
+---
+
+<canvas
+    id="map"
+    class="hidden absolute top-0 left-0 w-svw h-svh object-contain"
+    style="image-rendering: pixelated;"></canvas>
+<script>
+    function initMap() {
+        const canvas = document.getElementById("map") as HTMLCanvasElement;
+        const ctx = canvas.getContext("2d")!;
+        ctx.imageSmoothingEnabled = false;
+
+        function setCanvasSize() {
+            const snapshot = ctx.getImageData(
+                0,
+                0,
+                window.innerWidth,
+                window.innerHeight,
+            );
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            ctx.putImageData(snapshot, 0, 0);
+        }
+        setCanvasSize();
+        window.addEventListener("resize", setCanvasSize);
+
+        ctx.beginPath(); // Start a new path
+        // ctx.strokeRect(0, 0, canvas.width, canvas.height);
+        ctx.rect(0, 0, canvas.width, canvas.height); // Add a rectangle to the current path
+        ctx.fill();
+
+        const img = new Image();
+        img.width = 400;
+        img.height = 500;
+        img.addEventListener("load", () => {
+            // ctx.drawImage(img, 0, 0, 400, 500);
+        });
+        img.src = "/art/bigmapW4_80x100.png";
+
+        // ctx?.drawImage()
+
+        function frame() {
+
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", initMap);
+    document.addEventListener("astro:after-swap", initMap);
+</script>
+<div class="absolute w-svw h-svh">
+    <img
+        class="fixed top-0 left-0 select-none"
+        draggable="false"
+        src="/art/bigmapW4_80x100.png"
+        width="1000"
+        height="1200"
+        style="image-rendering: pixelated;"
+    />
+</div>

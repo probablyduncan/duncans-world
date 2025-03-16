@@ -1,0 +1,19 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { render } from "astro:content";
+import Sidebar from "./sidebar.astro";
+
+interface Props {
+    entry: CollectionEntry<"wiki">;
+}
+
+const { entry } = Astro.props;
+
+const renderResult = await render(entry);
+const headings = renderResult.headings;
+---
+
+<div data-entry={JSON.stringify(entry.data)}>
+    <h1>{entry.data.title}</h1>
+    <renderResult.Content components={{}} />
+</div>

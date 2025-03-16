@@ -1,0 +1,12 @@
+- id: town
+  plural: towns
+- id: region
+  plural: regions
+- id: story
+  plural: stories
+- id: song
+  plural: songs
+- id: culture
+  plural: cultures
+- id: meta
+  plural: meta

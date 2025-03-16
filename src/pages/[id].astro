@@ -1,0 +1,12 @@
+---
+import AllOfIt from "../components/all-of-it.astro";
+import { getWikiPaths } from "../lib/content";
+
+export async function getStaticPaths() {
+    return await getWikiPaths();
+}
+
+const { entry } = Astro.props;
+---
+
+<AllOfIt entry={entry} />
