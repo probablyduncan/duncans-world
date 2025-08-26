@@ -1,12 +1,17 @@
 ---
-import AllOfIt from "../components/all-of-it.astro";
-import { getWikiPaths } from "../lib/content";
+import AstroRoot from "../components/AstroRoot.astro";
+import { getWikiPaths, type WikiDTO } from "../lib/content";
 
 export async function getStaticPaths() {
     return await getWikiPaths();
 }
 
 const { entry } = Astro.props;
+const dto: WikiDTO = {
+    id: entry.id,
+    data: entry.data,
+    body: entry.body,
+}
 ---
 
-<AllOfIt entry={entry} />
+<AstroRoot entry={dto} />

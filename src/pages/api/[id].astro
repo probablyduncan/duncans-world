@@ -1,0 +1,13 @@
+---
+/**
+ * Returns a partial html snippet of rendered markdown for the given entry.
+ */
+
+import ContentPartial from "../../components/ContentPartial.astro";
+import { getWikiPaths } from "../../lib/content";
+
+export const partial = true;
+export const getStaticPaths = getWikiPaths;
+const { entry } = Astro.props;
+---
+<ContentPartial entry={entry} />

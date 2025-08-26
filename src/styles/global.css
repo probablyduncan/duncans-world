@@ -1,1 +1,271 @@
-@import "tailwindcss";
+@font-face {
+    font-family: 'Alte Haas Grotesk';
+    src: url('/fonts/AlteHaasGroteskRegular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Alte Haas Grotesk';
+    src: url('/fonts/AlteHaasGroteskBold.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Averia Serif Libre';
+    src: url('/fonts/AveriaSerifLibre-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Averia Serif Libre';
+    src: url('/fonts/AveriaSerifLibre-Italic.ttf') format('truetype');
+    font-weight: normal;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'Averia Serif Libre';
+    src: url('/fonts/AveriaSerifLibre-Bold.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Averia Serif Libre';
+    src: url('/fonts/AveriaSerifLibre-BoldItalic.ttf') format('truetype');
+    font-weight: bold;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'Averia Serif Libre';
+    src: url('/fonts/AveriaSerifLibre-Light.ttf') format('truetype');
+    font-weight: lighter;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Averia Serif Libre';
+    src: url('/fonts/AveriaSerifLibre-LightItalic.ttf') format('truetype');
+    font-weight: lighter;
+    font-style: italic;
+}
+
+:root {
+    overscroll-behavior: none;
+
+    --color-ink: #004058;
+    --color-sky: #E9F0FF;
+    --color-paper: #EEEEEE;
+
+    --font-serif: 'Averia Serif Libre', Georgia, 'Times New Roman', Times, serif;
+    --font-sans: 'Alte Haas Grotesk', Helvetica, Arial, sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    width: 100%;
+    height: 100vh;
+}
+
+h1,
+h2,
+h3 {
+    text-wrap: balance;
+}
+
+button {
+    font-family: inherit;
+    font-size: inherit;
+    color: inherit;
+    border: unset;
+    border-radius: unset;
+    background: unset;
+    cursor: pointer;
+    margin: unset;
+    padding: unset;
+}
+
+.sans,
+h1,
+h2,
+h3 {
+    font-family: var(--font-sans);
+}
+
+.serif,
+p {
+    font-family: var(--font-serif);
+}
+
+.map-container {
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    z-index: 1;
+    overflow: hidden;
+    background-image: url(/art/bigmapW4_small.jpg);
+    image-rendering: pixelated;
+    background-position: center;
+    background-size: cover;
+}
+
+.sidebar {
+    position: fixed;
+    right: 0;
+    top: 0;
+    height: 100vh;
+    z-index: 2;
+
+    width: min(45ch, 100%);
+    height: calc(100vh - 16px);
+    margin: 8px;
+
+    overflow-y: scroll;
+    overflow-x: hidden;
+    overscroll-behavior: none;
+
+    color: var(--color-ink);
+
+    border: 4px solid var(--color-ink);
+    border-radius: 2px;
+    background-color: #ffffffcc;
+    backdrop-filter: blur(4px);
+    box-shadow: 4px 4px 0 #00000022;
+}
+
+.search {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 3;
+    margin: 8px;
+
+    display: grid;
+    grid-template-columns: 80px 30ch;
+}
+
+.search .img {
+    background-image: url("/art/little-orange-house.png");
+    image-rendering: pixelated;
+    /* aspect-ratio: 18 / 10; */
+    height: 40px;
+    background-size: 80px 80px;
+    background-position-y: -44px;
+    border-block: 4px solid black;
+    box-shadow: 4px 4px 0 #00000011;
+
+    transition: background-position-y 0.2s;
+    
+}
+
+.search:focus-within .img {
+    background-position-y: -4px;
+}
+
+.search label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 0.2em;
+    border: 4px solid black;
+    border-left: none;
+
+    cursor: text;
+
+    background-color: #ffffffcc;
+    backdrop-filter: blur(4px);
+    box-shadow: 4px 4px 0 #00000011;
+
+    &,
+    & ::placeholder,
+    input {
+        font-family: var(--font-sans);
+        font-weight: bold;
+        color: var(--color-ink);
+        font-size: 1rem;
+    }
+
+    & ::placeholder {
+        opacity: 0.5;
+    }
+}
+
+.search input {
+    width: 100%;
+    flex: 1;
+    border: none;
+
+    &:focus,
+    &:focus-visible,
+    &:focus-within {
+        outline: none;
+    }
+
+    caret-color: var(--color-ink);
+}
+
+.search .keyhint {
+    font-family: var(--font-serif);
+    font-weight: bold;
+    font-size: 0.75em;
+    padding: 0.2em;
+    color: var(--color-ink);
+    display: inline-block;
+    border-radius: 5px;
+    border: 2px solid #00405858;
+    filter: blur(1px);
+
+    span {
+        filter: blur(0px);
+    }
+}
+
+.search:focus-within .keyhint {
+    display: none;
+}
+
+.search .results {
+    grid-row: 2;
+    grid-column: 2;
+    
+    background-color: #ffffffcc;
+    backdrop-filter: blur(4px);
+    box-shadow: 4px 4px 0 #00000011;
+    border: 4px solid black;
+    border-top: none;
+}
+
+.ui-button {
+    font-family: var(--font-sans);
+    font-weight: bold;
+
+    color: var(--color-ink);
+    backdrop-filter: blur(4px);
+    border: 2px solid var(--color-ink);
+    border-radius: 9999px;
+
+    aspect-ratio: 1 / 1;
+    padding: 0.8ex;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    transition: rotate 0.5s;
+}
+
+.ui-button:hover {
+    rotate: 380deg;
+}
+
+.ui-button:focus-visible {
+    rotate: 20deg;
+}

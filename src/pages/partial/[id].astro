@@ -1,9 +1,0 @@
----
-import Content from "../../components/content.astro";
-import { getWikiPaths } from "../../lib/content";
-
-export const partial = true;
-export const getStaticPaths = getWikiPaths;
-const { entry } = Astro.props;
----
-<Content entry={entry} />

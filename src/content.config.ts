@@ -1,7 +1,6 @@
 import { defineCollection, reference, z } from 'astro:content';
 import { glob, file } from 'astro/loaders';
 
-// 3. Define your collection(s)
 const wiki = defineCollection({
     loader: glob({ pattern: "**/*.mdx", base: "./src/data/wiki" }),
     schema: z.object({
@@ -22,5 +21,4 @@ const tags = defineCollection({
     })
 });
 
-// 4. Export a single `collections` object to register your collection(s)
 export const collections = { wiki, tags };

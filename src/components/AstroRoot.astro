@@ -1,0 +1,27 @@
+---
+import { SolidRoot } from "./SolidRoot";
+import "../styles/global.css";
+import IntroDialog from "./IntroDialog.astro";
+import { getSearchData, type WikiDTO } from "../lib/content";
+
+interface Props {
+    entry?: WikiDTO;
+}
+
+const { entry } = Astro.props;
+
+const searchData = await getSearchData();
+---
+
+<!doctype html>
+<html lang="en">
+    <head>
+        <title>Duncan's World</title>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width" />
+    </head>
+    <body>
+        <SolidRoot client:only entry={entry} searchData={searchData} />
+        <IntroDialog />
+    </body>
+</html>

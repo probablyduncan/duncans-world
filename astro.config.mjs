@@ -1,16 +1,14 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
-import tailwindcss from '@tailwindcss/vite';
-
 import mdx from '@astrojs/mdx';
 
-// https://astro.build/config
+import solidJs from '@astrojs/solid-js';
+
 export default defineConfig({
-  site: "https://duncans.world",
-
-  vite: {
-    plugins: [tailwindcss()]
-  },
-
-  integrations: [mdx()]
+    site: "https://duncans.world",
+    vite: {
+        // https://github.com/andi23rosca/solid-markdown/issues/33
+        optimizeDeps: { include: ['solid-markdown > micromark', 'solid-markdown > unified'], },
+    },
+    integrations: [mdx(), solidJs()],
 });
