@@ -46,7 +46,7 @@ export function MapContextProvider(props: ParentProps<{
 
     async function select(key?: string) {
 
-        if (!key) {
+        if (key === undefined) {
             setSelected("key", undefined);
             setSelected("entry", undefined);
             return;

@@ -1,6 +1,7 @@
 import { useMapContext } from "./MapContext";
 import levenshtein from "js-levenshtein";
 import { createSignal, For } from "solid-js";
+import type { SearchData, SearchEntry } from "../lib/content";
 
 export function Search() {
 
@@ -24,30 +25,20 @@ export function Search() {
         }
     });
 
-    const [results, setResults] = createSignal<string[]>([]);
+    const [results, setResults] = createSignal<SearchEntry[]>([]);
 
     function getSearchResults() {
         const searchString = input?.value ?? "";
 
-        if (!searchString) {
+        if (searchString === "") {
             setResults([]);
+            return;
         };
 
-        // const cache = new Map<string, number>();
-        // function getDiffCached(str: string) {
-        //     let diff = cache.get(str);
-        //     if (diff === undefined) {
-        //         diff = getDiffImpl(searchString, str);
-        //         cache.set(str, diff);
-        //     }
-        //     return diff;
-        // }
-
-        const results = searchData.entryIDs.map(id => ({
-            id, diff: getDiffImpl(searchString, id),
-        })).sort((a, b) => a.diff - b.diff);
-
-        setResults(results.filter(r => r.diff <= 10).map(r => r.id));
+        setResults(Object.values(searchData.entries)
+            .map(entry => ({ ...entry, diff: getDiffImpl(searchString, entry) }))
+            .sort((a, b) => a.diff - b.diff)
+            .slice(0, 5));
     }
 
     function blurSearch() {
@@ -58,16 +49,50 @@ export function Search() {
         }
     }
 
+    function onSearchKeyDown(e: KeyboardEvent) {
+        if (e.key === "Escape") {
+            e.stopPropagation();
+            e.preventDefault();
+            blurSearch();
+        }
+    }
+
+    function onInputKeyDown(e: KeyboardEvent) {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            if (results().length > 0) {
+                select(results()[0].key);
+            }
+            blurSearch();
+        }
+    }
+
     return (<>
-        <div class="search" onkeydown={(e) => {
-            if (e.key === "Escape") blurSearch()
-        }}>
+        <div class="search" onkeydown={onSearchKeyDown}>
             <div class="img"></div>
             <label>
-                <input ref={input} oninput={getSearchResults} placeholder="Search ..." />
+                <input ref={input} oninput={getSearchResults} onkeydown={onInputKeyDown} placeholder="Search ..." />
                 <span class="keyhint"><span>{modifierLabel} + K</span></span>
             </label>
-            <div class="results"><For each={results()}>{(r) => <div><button onclick={() => select(r)}>{r}</button></div>}</For></div>
+            {results().length && <ul>
+                <For each={results()}>{(entry) => {
+                    return (<li>
+                        <a href={"/" + entry.key} onclick={e => {
+                            if (
+                                e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey
+                            ) {
+                                return;
+                            }
+
+                            e.preventDefault();
+                            select(entry.key);
+                            blurSearch();
+                        }}>
+                            {entry.title} {entry.tags.length && <span class="serif">&lcub;{entry.tags.join(", ")}&rcub;</span>}
+                        </a>
+                    </li>)
+                }}</For>
+            </ul>}
         </div>
     </>)
 }
@@ -77,14 +102,23 @@ export function Search() {
 
 
 
-function getDiffImpl(searchString: string, targetString: string) {
-    const diff = levenshtein(searchString, targetString);
+function getDiffImpl(searchString: string, entry: SearchEntry) {
 
-    // const stringSizeDiff = Math.abs(searchString.length - targetString.length);
+    searchString = searchString.toLowerCase();
+    const targetString = entry.title.toLowerCase();
 
-    // if (diff === stringSizeDiff && searchString.length > 1) {
-    //     return 0;
-    // }
+    let diff = levenshtein(searchString, targetString);
+    const index = targetString.indexOf(searchString);
+
+    // if search in title
+    if (index !== -1) {
+        diff -= targetString.length - searchString.length;
+
+        // if search is start of word in title
+        if (index === 0 || targetString[index - 1] === " ") {
+            diff -= targetString.length;
+        }
+    }
 
     return diff;
 }

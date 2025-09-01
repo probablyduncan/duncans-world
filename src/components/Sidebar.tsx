@@ -5,7 +5,17 @@ import type { ParentProps } from "solid-js"
 
 export function Sidebar() {
 
-    const { selected, select } = useMapContext()
+    const { selected, select } = useMapContext();
+
+    window.addEventListener("keydown", e => {
+        if (e.key === "Escape") {
+            // close sidebar
+            select();
+        }
+
+        // this `false` means it'll get called after keydown event in search,
+        // which will capture escape key and stopPropagation to blur search
+    }, false);
 
     return (<>
         {selected.entry && <div class="sidebar">
@@ -40,7 +50,7 @@ function Link(props) {
 
     const href = props.href?.toString() ?? "";
     const attrs = {}
-    if (searchData.entryIDs.includes(href)) {
+    if (href in searchData.entries) {
         attrs["onclick"] = () => { select(href); }
         attrs["style"] = { color: "cornflowerblue", cursor: "pointer", "text-decoration": "underline" };
         attrs["title"] = "Navigate to view";

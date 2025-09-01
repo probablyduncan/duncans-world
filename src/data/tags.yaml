@@ -10,3 +10,5 @@
   plural: cultures
 - id: meta
   plural: meta
+- id: beast
+  plural: beasts
