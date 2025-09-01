@@ -2,6 +2,7 @@ import { useMapContext } from "./MapContext";
 import levenshtein from "js-levenshtein";
 import { createSignal, For } from "solid-js";
 import type { SearchData, SearchEntry } from "../lib/content";
+import { EntryLink } from "./EntryLink";
 
 export function Search() {
 
@@ -77,19 +78,9 @@ export function Search() {
             {results().length && <ul>
                 <For each={results()}>{(entry) => {
                     return (<li>
-                        <a href={"/" + entry.key} onclick={e => {
-                            if (
-                                e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey
-                            ) {
-                                return;
-                            }
-
-                            e.preventDefault();
-                            select(entry.key);
-                            blurSearch();
-                        }}>
+                        <EntryLink key={entry.key} title={entry.title} onclick={blurSearch}>
                             {entry.title} {entry.tags.length && <span class="serif">&lcub;{entry.tags.join(", ")}&rcub;</span>}
-                        </a>
+                        </EntryLink>
                     </li>)
                 }}</For>
             </ul>}

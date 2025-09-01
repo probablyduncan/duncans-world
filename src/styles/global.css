@@ -60,6 +60,8 @@
     --color-ink: #004058;
     --color-sky: #E9F0FF;
     --color-paper: #EEEEEE;
+    --color-blue: cornflowerblue;
+    --color-red: indianred;
 
     --font-serif: 'Averia Serif Libre', Georgia, 'Times New Roman', Times, serif;
     --font-sans: 'Alte Haas Grotesk', Helvetica, Arial, sans-serif;
@@ -113,10 +115,67 @@ p {
     position: fixed;
     z-index: 1;
     overflow: hidden;
-    background-image: url(/art/bigmapW4_small.jpg);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.map-container .map {
+    aspect-ratio: 4 / 5;
+
+    --unit: 2px;
+
+    border: var(--unit) solid var(--color-ink);
+    width: calc(var(--unit) * 300);
+    height: calc(var(--unit) * 375);
+
     image-rendering: pixelated;
+    background-image: url(/art/bigmapW4_small.jpg);
     background-position: center;
     background-size: cover;
+
+    position: relative;
+}
+
+.map-container .map a {
+
+    font-family: var(--font-serif);
+    text-decoration: none;
+    color: black;
+
+    position: absolute;
+
+    --x: 9999%;
+    --y: 9999%;
+    top: var(--y);
+    left: var(--x);
+
+    &.left {
+        /* transform-origin: left; */
+    }
+
+    &.center {
+        transform: translate(-50%, -50%);
+    }
+
+    z-index: 2;
+    &:hover {
+        z-index: 4;
+        background-color: #ffffffcc;
+        backdrop-filter: blur(4px);
+        box-shadow: 4px 4px 0 #00000011;
+    }
+    
+    &.selected {
+        z-index: 3;
+        background-color: #ffffffcc;
+        backdrop-filter: blur(4px);
+        box-shadow: 4px 4px 0 #00000011;
+        /* font-style: italic; */
+        color: indianred;
+        cursor: no-drop;
+    }
 }
 
 .sidebar {
@@ -124,7 +183,7 @@ p {
     right: 0;
     top: 0;
     height: 100vh;
-    z-index: 2;
+    z-index: 10;
 
     width: min(45ch, 100%);
     height: calc(100vh - 16px);
@@ -143,9 +202,10 @@ p {
     box-shadow: 4px 4px 0 #00000022;
 }
 
-.sidebar p {
+.sidebar p, .sidebar a {
     text-decoration: underline;
     text-decoration-style: dotted;
+    text-decoration-color: var(--color-ink);
 }
 
 .sidebar ::selection {
@@ -153,11 +213,22 @@ p {
     background-color: var(--color-ink);
 }
 
+.sidebar a {
+    color: var(--color-blue);
+    cursor: pointer;
+}
+
+.sidebar span.bad-link {
+    color: var(--color-red);
+    text-decoration-color: inherit;
+    cursor: no-drop;
+}
+
 .search {
     position: fixed;
     top: 0;
     left: 0;
-    z-index: 3;
+    z-index: 10;
     margin: 8px;
 
     display: grid;

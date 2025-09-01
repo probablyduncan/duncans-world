@@ -2,6 +2,8 @@ import { SolidMarkdown } from "solid-markdown"
 import { useMapContext } from "./MapContext"
 import type { HTMLAttributes } from "astro/types"
 import type { ParentProps } from "solid-js"
+import { EntryLink } from "./EntryLink";
+import { getComponentText } from "../lib/getComponentText";
 
 export function Sidebar() {
 
@@ -44,21 +46,43 @@ export function Sidebar() {
     </>)
 }
 
-function Link(props) {
+function Link(props: ParentProps<{
+    href?: string;
+    title?: string;
+}>) {
 
-    const { select, searchData } = useMapContext()
+    const { searchData } = useMapContext();
 
-    const href = props.href?.toString() ?? "";
-    const attrs = {}
-    if (href in searchData.entries) {
-        attrs["onclick"] = () => { select(href); }
-        attrs["style"] = { color: "cornflowerblue", cursor: "pointer", "text-decoration": "underline" };
-        attrs["title"] = "Navigate to view";
-    }
-    else {
-        attrs["style"] = { color: "indianred", cursor: "not-allowed" };
-        attrs["title"] = "I'm still working on that!"
+    let key: string = "";
+    
+    if (props.href) {
+        // try get key from href
+        key = props.href.toString();
     }
 
-    return <a {...attrs}>{props.children}</a>
+    if (key === "") {
+        // try get key from inner text
+        key = getComponentText(props.children).toLowerCase().replaceAll(" ", "-");
+    }
+
+    if (key in searchData.entries) {
+        const entry = searchData.entries[key];
+        return (
+            <EntryLink
+                key={key}
+                title={entry.title}
+            >
+                {props.children}
+            </EntryLink>
+        );
+    }
+
+    return (
+        <span
+            title="I’m still working on that!"
+            class="bad-link"
+        >
+            {props.children}
+        </span>
+    );
 }
