@@ -63,6 +63,8 @@
 
     --font-serif: 'Averia Serif Libre', Georgia, 'Times New Roman', Times, serif;
     --font-sans: 'Alte Haas Grotesk', Helvetica, Arial, sans-serif;
+
+    background-color: var(--color-sky);
 }
 
 * {
@@ -139,6 +141,16 @@ p {
     background-color: #ffffffcc;
     backdrop-filter: blur(4px);
     box-shadow: 4px 4px 0 #00000022;
+}
+
+.sidebar p {
+    text-decoration: underline;
+    text-decoration-style: dotted;
+}
+
+.sidebar ::selection {
+    color: var(--color-paper);
+    background-color: var(--color-ink);
 }
 
 .search {
@@ -224,6 +236,7 @@ p {
     border-radius: 5px;
     border: 2px solid #00405858;
     filter: blur(1px);
+    user-select: none;
 
     span {
         filter: blur(0px);
@@ -259,7 +272,7 @@ p {
 .search li a {
     display: block;
     padding: 4px;
-    
+
     color: var(--color-ink);
     text-decoration: none;
 
@@ -267,7 +280,8 @@ p {
     font-weight: bold;
 }
 
-.search li a:focus-visible, .search li a:hover {
+.search li a:focus-visible,
+.search li a:hover {
     outline: none;
     background-color: var(--color-paper);
 }
