@@ -1,6 +1,8 @@
-import { createSignal, For } from "solid-js";
+import { createEffect, createSignal, For } from "solid-js";
 import { useMapContext } from "./MapContext";
 import { EntryLink } from "./EntryLink";
+import { Gesture } from "@use-gesture/vanilla";
+import { clamp } from "@probablyduncan/common";
 
 interface MapContainerProps {
     labels: LabelProps[]
@@ -17,19 +19,26 @@ type LabelProps = {
 
 }
 
+/**
+ * how about:
+ * map itself is scaled with transform
+ * but label container is scaled with width/height
+ * would that work
+ */
+
 export function MapContainer(props: MapContainerProps) {
 
     const { select, selected } = useMapContext();
 
     const labels: LabelProps[] = [
         {
-            coords: [0.75, 0.48],
+            coords: [0.746, 0.484],
             text: "Daybreak",
             key: "daybreak",
             origin: "left",
         },
         {
-            coords: [0.69, 0.48],
+            coords: [0.697, 0.482],
             text: "The Cauldron",
             key: "cauldron",
             origin: "center",
@@ -56,9 +65,86 @@ export function MapContainer(props: MapContainerProps) {
         }
     });
 
+    let containerEl: HTMLDivElement | undefined;
+    createEffect(() => {
+        if (!containerEl) return;
+        const mapEl = containerEl.querySelector(".map")!;
+
+        const gesture = new Gesture(containerEl, {
+            onDrag: ({ offset: [x, y], pinching, cancel }) => {
+                if (pinching) return cancel();
+                setPos([x, y]);
+            },
+            onPinch: ({ origin: [ox, oy], first, movement: [ms], offset: [s, a], memo }) => {
+
+                if (first) {
+                    const { width, height, x, y } = mapEl.getBoundingClientRect()
+                    const tx = ox - (x + width / 2)
+                    const ty = oy - (y + height / 2)
+                    const [boundX, boundY] = getPosBounds(mapEl, containerEl);
+                    memo = [pos()[0], pos()[1], tx, ty, boundX, boundY];
+                }
+
+                const x = memo[0] - (ms - 1) * memo[2]
+                const y = memo[1] - (ms - 1) * memo[3]
+                setScale(s);
+                setPos([
+                    clamp(x, -memo[4], memo[4]),
+                    clamp(y, -memo[5], memo[5]),
+                ]);
+                return memo;
+            },
+            onWheel: ({ delta: [dx, dy] }) => {
+                // translate map based on x/y scroll
+                setPos(prev => [prev[0] - dx, prev[1] - dy]);
+            }
+        }, {
+            target: mapEl,
+            drag: {
+                from: () => [pos()[0], pos()[1]],
+                // bounds: () => getPosBoundsAsGestureBounds(mapEl, containerEl),
+            },
+            pinch: { scaleBounds: { min: 1, max: 10 } },
+            wheel: {
+                // bounds: () => getPosBoundsAsGestureBounds(mapEl, containerEl),
+            }
+        });
+    });
+
+    // pinch memo is broken, or on first pinch tick
+    // something is not set properly
+
+    // it seems like when pos or scale get set outside of
+    // explicitly bounded gestures (wheel and drag), they
+    // don't update the bounds function and some memo is outdated
+
+    function getPosBoundsAsGestureBounds(mapEl: Element, containerEl: Element) {
+        const [boundX, boundY] = getPosBounds(mapEl, containerEl);
+        return {
+            top: -boundY,
+            bottom: boundY,
+            left: -boundX,
+            right: boundX,
+        }
+    }
+
+    function getPosBounds(mapEl: Element, containerEl: Element): [number, number] {
+        const { width: mapWidth, height: mapHeight } = mapEl.getBoundingClientRect();
+        const { width: containerWidth, height: containerHeight } = containerEl.getBoundingClientRect();
+
+        const boundY = (mapHeight / 2) + (containerHeight / 2) - 24;
+        const boundX = (mapWidth / 2) + (containerWidth / 2) - 24;
+
+        return [boundX, boundY];
+    }
+
     return (<>
-        <div class="map-container">
-            <div class="map" style={{}}>
+        <div ref={containerEl} class="map-container">
+            <div class="map" style={{
+                "--x": `${pos()[0]}px`,
+                "--y": `${pos()[1]}px`,
+                "--scale": scale(),
+            }}>
                 <For each={labels}>
                     {label =>
                         <EntryLink
@@ -78,38 +164,6 @@ export function MapContainer(props: MapContainerProps) {
                             {label.origin === "left" && "* "}{label.text}
                         </EntryLink>
                     }
-                    {/* {label => <a
-                        href={label.key}
-                        title={label.text}
-                        onClick={e => {
-
-                            // check if trying to open in new tab and allow that
-                            if (e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) {
-                                return;
-                            }
-
-                            // otherwise select in current window
-                            e.preventDefault();
-
-                            if (selected.key === label.key) {
-                                select();
-                            }
-                            else {
-                                select(label.key);
-                            }
-
-
-                        }}
-                        classList={{
-                            left: label.origin === "left",
-                            center: label.origin === "center",
-                            selected: selected.key === label.key,
-                        }}
-                        style={{
-                            "--x": `${coordToCSSPercentage(label.coords[0])}`,
-                            "--y": `${coordToCSSPercentage(label.coords[1])}`,
-                        }}
-                    >{label.origin === "left" && "* "}{label.text}</a>} */}
                 </For>
             </div>
         </div>

@@ -119,6 +119,8 @@ p {
     display: flex;
     align-items: center;
     justify-content: center;
+
+    touch-action: none;
 }
 
 .map-container .map {
@@ -136,9 +138,18 @@ p {
     background-size: cover;
 
     position: relative;
+
+    --x: 0;
+    --y: 0;
+    --scale: 1;
+
+    transform: translate(var(--x), var(--y)) scale(var(--scale, 1));
 }
 
 .map-container .map a {
+
+    font-size: calc(1em / var(--scale));
+    line-height: 1;
 
     font-family: var(--font-serif);
     text-decoration: none;
@@ -159,20 +170,21 @@ p {
         transform: translate(-50%, -50%);
     }
 
+    
+    &:hover, &.selected {
+        background-color: #ffffffcc;
+        --shadow-size: calc(4px / var(--scale));
+        backdrop-filter: blur(var(--shadow-size));
+        box-shadow: var(--shadow-size) var(--shadow-size) 0 #00000011;
+    }
+
     z-index: 2;
     &:hover {
         z-index: 4;
-        background-color: #ffffffcc;
-        backdrop-filter: blur(4px);
-        box-shadow: 4px 4px 0 #00000011;
     }
     
     &.selected {
         z-index: 3;
-        background-color: #ffffffcc;
-        backdrop-filter: blur(4px);
-        box-shadow: 4px 4px 0 #00000011;
-        /* font-style: italic; */
         color: indianred;
         cursor: no-drop;
     }
