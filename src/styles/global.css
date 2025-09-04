@@ -125,13 +125,15 @@ p {
     --x: 0px;
     --y: 0px;
     --scale: 1;
+
+    --map-starting-width: min(calc(100vw - 32px), calc(80svh - 32px));
 }
 
 .map-container .map {
     aspect-ratio: 4 / 5;
 
     border: 2.5px solid var(--color-ink);
-    width: min(calc(100vw - 16px), calc(80svh - 16px));
+    width: var(--map-starting-width);
 
     image-rendering: pixelated;
     background-image: url(/art/bigmapW4_small.jpg);
@@ -146,11 +148,10 @@ p {
 .map-container .labels {
     position: absolute;
     pointer-events: none;
-
-    width: min(calc(var(--scale) * (100vw - 16px)), calc(var(--scale) * (80svh - 16px)));
-    transform: translate(var(--x), var(--y));
-
+    user-select: none;
     aspect-ratio: 4 / 5;
+    width: calc(var(--scale) * var(--map-starting-width));
+    transform: translate(var(--x), var(--y));
 }
 
 .map-container .labels a {
@@ -197,6 +198,73 @@ p {
         color: indianred;
         cursor: no-drop;
     }
+}
+
+.map-container .border {
+    position: absolute;
+    pointer-events: none;
+    user-select: none;
+    border: 2.5px solid var(--color-ink);
+    border-width: 4px;
+
+    /* width needs to be the starting width * scale, minus the distance  */
+    /* x/y pos should be clamped above 0, because the top/left border should always be visible */
+    /* x/y pos doesn't need to be clamped down, because w/h will decrease */
+
+    --w: calc(var(--map-starting-width) * var(--scale));
+    --h: calc(var(--map-starting-width) * var(--scale) * 5 / 4);
+
+    /* 
+        when top/left, width/height
+       needs to decrease by the distance
+       of the map past the edge of the viewport
+
+       distance beyond edge of viewport:
+       abs(pos) - ((100vw - mapWidth) / 2)
+    */
+
+    --w-clamped: calc(var(--w) - max(0px, abs(var(--x)) - ( 100vw - var(--w) ) / 2));
+    --h-clamped: calc(var(--h) - max(0px, abs(var(--y)) - ( 100svh - var(--h) ) / 2));
+
+    width: var(--w-clamped);
+    height: var(--h-clamped);
+
+    /* 
+        when distance beyond edge of viewport is greater than 0
+        I need to translate *less* half that distance
+
+        when pos is negative, I need to add half the distance
+        when pos is positive, I need to subtract half the distance
+
+        get portion of pos beyond viewport edge:
+        pos * max(0px, abs(pos) - ((100v - mapSize) / 2)) / abs(pos)
+
+        if pos is negative, this will be negative, and vice versa
+
+        so I get pos, and subtract the portion of it that's outside the viewport
+        in other words, I want the portion of pos that's NOT outside the viewport
+
+        so pos * (1 - portion)
+
+        newpos = portion of pos that's within viewport
+        newpos = pos - portion outside of viewport
+
+        if |x| is greater than half viewport, I want to multiply x so that it stays within viewport
+        if |x| is less than half viewport, I want to multiply it by 1
+
+        keep x bounded:
+        clamp(x, -50vw, 50vw)
+
+        but I actually want to clamp it to:
+        clamp(x, -50vw + borderwidth/2, 50vw - borderwidth/2)
+
+        newpos = x * max(0, |x| - 50vw) / 50vw
+    */
+
+    --x-clamped: clamp(var(--x), calc(-50vw + var(--w-clamped) / 2), calc(50vw - var(--w-clamped) / 2));
+    --y-clamped: clamp(var(--y), calc(-50svh + var(--h-clamped) / 2), calc(50svh - var(--h-clamped) / 2));
+
+    transform: translate(var(--x-clamped), var(--y-clamped));
 }
 
 .sidebar {

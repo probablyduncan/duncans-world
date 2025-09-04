@@ -167,6 +167,7 @@ export function MapContainer(props: MapContainerProps) {
                     }
                 </For>
             </div>
+            {/* <div class="border"></div> */}
         </div>
     </>)
 }
