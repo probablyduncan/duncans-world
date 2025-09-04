@@ -1,4 +1,4 @@
-import { createEffect, createSignal, For } from "solid-js";
+import { createEffect, createSignal, For, type Setter } from "solid-js";
 import { useMapContext } from "./MapContext";
 import { EntryLink } from "./EntryLink";
 import { Gesture } from "@use-gesture/vanilla";
@@ -50,7 +50,21 @@ export function MapContainer(props: MapContainerProps) {
     }
 
     const [pos, setPos] = createSignal<[number, number]>([0, 0]);
-    const [scale, setScale] = createSignal<number>(1);
+    const [scale, setScaleImpl] = createSignal<number>(1);
+    const [mapArt, setMapArt] = createSignal<"sm" | "md" | "lg">("sm");
+
+    function setScale(...args: Parameters<Setter<number>>) {
+        setScaleImpl(prev => clamp(typeof args[0] === "function" ? args[0](prev) : args[0], 1, 16));
+        if (scale() > 4) {
+            setMapArt("lg");
+        }
+        else if (scale() > 1) {
+            setMapArt("md");
+        }
+        else {
+            setMapArt("sm");
+        }
+    }
 
     function resetMap() {
         select();
@@ -104,7 +118,7 @@ export function MapContainer(props: MapContainerProps) {
                 from: () => [pos()[0], pos()[1]],
                 // bounds: () => getPosBoundsAsGestureBounds(mapEl, containerEl),
             },
-            pinch: { scaleBounds: { min: 1, max: 10 } },
+            pinch: { scaleBounds: { min: 1, max: 16 } },
             wheel: {
                 // bounds: () => getPosBoundsAsGestureBounds(mapEl, containerEl),
             }
@@ -143,6 +157,8 @@ export function MapContainer(props: MapContainerProps) {
             "--x": `${pos()[0]}px`,
             "--y": `${pos()[1]}px`,
             "--scale": scale(),
+            "--map-url": `url(/art/${mapArt() === "lg" ? "bigmapW4.jpg" : mapArt() === "md" ? "bigmapW4_small.jpg" : "bigmapW4_80x100.png"})`,
+            "--map-px-width": mapArt() === "lg" ? "1200" : mapArt() === "md" ? "300" : "80",
         }}>
             <div class="map"></div>
             <div class="labels">

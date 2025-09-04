@@ -126,23 +126,26 @@ p {
     --y: 0px;
     --scale: 1;
 
+    --map-url: url(/art/bigmapW4_80x100.png);
+    --map-px-width: 80;
+    --px-size: calc(var(--scale) * var(--map-starting-width) / var(--map-px-width));
+
     --map-starting-width: min(calc(100vw - 32px), calc(80svh - 32px));
 }
 
 .map-container .map {
+
+    width: var(--map-starting-width);
     aspect-ratio: 4 / 5;
 
-    border: 2.5px solid var(--color-ink);
-    width: var(--map-starting-width);
-
     image-rendering: pixelated;
-    background-image: url(/art/bigmapW4_small.jpg);
+    background-image: var(--map-url);
     background-position: center;
     background-size: cover;
 
     position: relative;
 
-    transform: translate(var(--x), var(--y)) scale(var(--scale, 1));
+    transform: translate(var(--x), var(--y)) scale(var(--scale));
 }
 
 .map-container .labels {
@@ -152,6 +155,9 @@ p {
     aspect-ratio: 4 / 5;
     width: calc(var(--scale) * var(--map-starting-width));
     transform: translate(var(--x), var(--y));
+
+    border: var(--px-size) solid var(--color-ink);
+    box-shadow: var(--px-size) var(--px-size) 0 #00000011;
 }
 
 .map-container .labels a {
@@ -159,6 +165,7 @@ p {
     font-size: calc(1em / var(--scale));
     font-size: 1em;
     font-size: calc(1em * sqrt(var(--scale)));
+    font-size: calc(0.5em + log(var(--scale)) * 1em);
     line-height: 1;
 
     font-family: var(--font-serif);
