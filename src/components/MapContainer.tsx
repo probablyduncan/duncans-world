@@ -139,12 +139,13 @@ export function MapContainer(props: MapContainerProps) {
     }
 
     return (<>
-        <div ref={containerEl} class="map-container">
-            <div class="map" style={{
-                "--x": `${pos()[0]}px`,
-                "--y": `${pos()[1]}px`,
-                "--scale": scale(),
-            }}>
+        <div ref={containerEl} class="map-container" style={{
+            "--x": `${pos()[0]}px`,
+            "--y": `${pos()[1]}px`,
+            "--scale": scale(),
+        }}>
+            <div class="map"></div>
+            <div class="labels">
                 <For each={labels}>
                     {label =>
                         <EntryLink

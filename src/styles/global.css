@@ -111,7 +111,7 @@ p {
 
 .map-container {
     width: 100vw;
-    height: 100vh;
+    height: 100svh;
     position: fixed;
     z-index: 1;
     overflow: hidden;
@@ -121,16 +121,17 @@ p {
     justify-content: center;
 
     touch-action: none;
+
+    --x: 0px;
+    --y: 0px;
+    --scale: 1;
 }
 
 .map-container .map {
     aspect-ratio: 4 / 5;
 
-    --unit: 2px;
-
-    border: var(--unit) solid var(--color-ink);
-    width: calc(var(--unit) * 300);
-    height: calc(var(--unit) * 375);
+    border: 2.5px solid var(--color-ink);
+    width: min(calc(100vw - 16px), calc(80svh - 16px));
 
     image-rendering: pixelated;
     background-image: url(/art/bigmapW4_small.jpg);
@@ -139,16 +140,24 @@ p {
 
     position: relative;
 
-    --x: 0;
-    --y: 0;
-    --scale: 1;
-
     transform: translate(var(--x), var(--y)) scale(var(--scale, 1));
 }
 
-.map-container .map a {
+.map-container .labels {
+    position: absolute;
+    pointer-events: none;
+
+    width: min(calc(var(--scale) * (100vw - 16px)), calc(var(--scale) * (80svh - 16px)));
+    transform: translate(var(--x), var(--y));
+
+    aspect-ratio: 4 / 5;
+}
+
+.map-container .labels a {
 
     font-size: calc(1em / var(--scale));
+    font-size: 1em;
+    font-size: calc(1em * sqrt(var(--scale)));
     line-height: 1;
 
     font-family: var(--font-serif);
@@ -156,6 +165,7 @@ p {
     color: black;
 
     position: absolute;
+    pointer-events: all;
 
     --x: 9999%;
     --y: 9999%;
@@ -173,9 +183,8 @@ p {
     
     &:hover, &.selected {
         background-color: #ffffffcc;
-        --shadow-size: calc(4px / var(--scale));
-        backdrop-filter: blur(var(--shadow-size));
-        box-shadow: var(--shadow-size) var(--shadow-size) 0 #00000011;
+        backdrop-filter: blur(4px);
+        box-shadow: 2.5px 2.5px 0 #00000011;
     }
 
     z-index: 2;
